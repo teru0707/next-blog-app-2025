@@ -22,15 +22,6 @@ const Page: React.FC = () => {
           className="rounded-full border-4 border-slate-500 p-1.5"
         />
       </div>
-      <div className={twMerge("mx-auto mb-5 flex justify-center md:w-2/3")}>
-        <Image
-          src="https://avataaars.io/?avatarStyle=Circle&topType=ShortHairShortCurly&accessoriesType=Round&hairColor=Black&facialHairType=MoustacheFancy&facialHairColor=Platinum&clotheType=CollarSweater&clotheColor=PastelBlue&graphicType=Diamond&eyeType=EyeRoll&eyebrowType=UpDown&mouthType=Grimace&skinColor=DarkBrown"
-          alt="Remote Image"
-          width={350}
-          height={350}
-          unoptimized
-        />
-      </div>
     </main>
   );
 };
