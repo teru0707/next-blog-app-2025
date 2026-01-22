@@ -21,7 +21,6 @@ const Page: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fetchErrorMsg, setFetchErrorMsg] = useState<string | null>(null);
   const [newCategoryName, setNewCategoryName] = useState("");
-  const [newCategoryNameError, setNewCategoryNameError] = useState("");
 
   // カテゴリ配列 (State)。取得中と取得失敗時は null、既存カテゴリが0個なら []
   const [categories, setCategories] = useState<Category[] | null>(null);
@@ -50,7 +49,7 @@ const Page: React.FC = () => {
         apiResBody.map((body) => ({
           id: body.id,
           name: body.name,
-        })),
+        }))
       );
     } catch (error) {
       const errorMsg =
@@ -70,20 +69,8 @@ const Page: React.FC = () => {
     fetchCategories();
   }, []);
 
-  // カテゴリの名前のバリデーション
-  const isValidCategoryName = (name: string): string => {
-    if (name.length < 2 || name.length > 16) {
-      return "2文字以上16文字以内で入力してください。";
-    }
-    if (categories && categories.some((c) => c.name === name)) {
-      return "同じ名前のカテゴリが既に存在します。";
-    }
-    return "";
-  };
-
   // テキストボックスの値が変更されたときにコールされる関数
   const updateNewCategoryName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewCategoryNameError(isValidCategoryName(e.target.value));
     setNewCategoryName(e.target.value);
   };
 
@@ -92,34 +79,13 @@ const Page: React.FC = () => {
     e.preventDefault(); // これを実行しないと意図せずページがリロードされるので注意
     setIsSubmitting(true);
 
-    // ▼▼ 追加 ウェブAPI (/api/admin/categories) にPOSTリクエストを送信する処理
-    try {
-      const requestUrl = "/api/admin/categories";
-      const res = await fetch(requestUrl, {
-        method: "POST",
-        cache: "no-store",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: newCategoryName }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`${res.status}: ${res.statusText}`); // -> catch節に移動
-      }
-
-      setNewCategoryName("");
-      await fetchCategories(); // カテゴリの一覧を再取得
-    } catch (error) {
-      const errorMsg =
-        error instanceof Error
-          ? `カテゴリのPOSTリクエストに失敗しました\n${error.message}`
-          : `予期せぬエラーが発生しました\n${error}`;
-      console.error(errorMsg);
-      window.alert(errorMsg);
-    } finally {
+    // ダミーの送信処理 (あとで実際の送信処理を追加する)
+    const requestBody = JSON.stringify({ name: newCategoryName });
+    console.log(`POST /api/admin/categories => ${requestBody}`);
+    setTimeout(() => {
       setIsSubmitting(false);
-    }
+      setNewCategoryName("");
+    }, 2000);
   };
 
   // カテゴリをウェブAPIから取得中の画面
@@ -171,17 +137,7 @@ const Page: React.FC = () => {
             value={newCategoryName}
             onChange={updateNewCategoryName}
             autoComplete="off"
-            required
           />
-          {newCategoryNameError && (
-            <div className="flex items-center space-x-1 text-sm font-bold text-red-500">
-              <FontAwesomeIcon
-                icon={faTriangleExclamation}
-                className="mr-0.5"
-              />
-              <div>{newCategoryNameError}</div>
-            </div>
-          )}
         </div>
 
         <div className="flex justify-end">
@@ -189,14 +145,8 @@ const Page: React.FC = () => {
             type="submit"
             className={twMerge(
               "rounded-md px-5 py-1 font-bold",
-              "bg-indigo-500 text-white hover:bg-indigo-600",
-              "disabled:cursor-not-allowed disabled:opacity-50",
+              "bg-indigo-500 text-white hover:bg-indigo-600"
             )}
-            disabled={
-              isSubmitting ||
-              newCategoryNameError !== "" ||
-              newCategoryName === ""
-            }
           >
             カテゴリを作成
           </button>
@@ -219,7 +169,7 @@ const Page: React.FC = () => {
                 key={category.id}
                 className={twMerge(
                   "rounded-md px-2 py-0.5",
-                  "border border-slate-400 text-slate-500",
+                  "border border-slate-400 text-slate-500"
                 )}
               >
                 <Link href={`/admin/categories/${category.id}`}>
